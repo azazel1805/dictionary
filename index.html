@@ -3,25 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dictionary</title>
+    <title>AI Powered Dictionary</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- ADD THIS LINE FOR THE FAVICON -->
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
 </head>
 <body>
     <main class="container">
-        <h1>Dictionary</h1>
+        <h1>AI Dictionary</h1>
         <p class="subtitle">Explore words with the power of AI</p>
+
+        <!-- NEW: Language Selector -->
+        <div class="settings-container">
+            <label for="language-select">Translate to:</label>
+            <select id="language-select">
+                <option value="Turkish">Turkish</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Japanese">Japanese</option>
+            </select>
+        </div>
+
         <form id="search-form">
             <input type="text" id="search-input" placeholder="Enter a word..." required>
             <button type="submit">Search</button>
         </form>
 
+        <!-- NEW: Search History -->
+        <div id="history-container" class="hidden">
+            <h3>Recent:</h3>
+            <div id="history-list"></div>
+        </div>
+
         <div id="loader" class="loader hidden"></div>
-        
         <div id="error-message" class="error-message hidden"></div>
 
         <div id="results-container" class="hidden">
@@ -36,29 +53,46 @@
                 <p id="result-pronunciation"></p>
                 <button id="speak-button" title="Listen to pronunciation">🔊</button>
             </div>
+
             <div class="result-section" id="definitions-section">
-                <h3>Definitions:</h3>
+                <div class="section-header">
+                    <h3>Definitions:</h3>
+                    <!-- NEW: ELI5 Button -->
+                    <button id="eli5-button" class="action-button">Explain Like I'm 5</button>
+                </div>
                 <div id="result-definitions"></div>
             </div>
+
             <div class="result-section" id="synonyms-section">
                 <h3>Synonyms:</h3>
-                <p id="result-synonyms"></p>
+                <!-- Changed from <p> to <div> to hold buttons -->
+                <div id="result-synonyms"></div>
             </div>
+
             <div class="result-section" id="antonyms-section">
                 <h3>Antonyms:</h3>
-                <p id="result-antonyms"></p>
+                <!-- Changed from <p> to <div> to hold buttons -->
+                <div id="result-antonyms"></div>
             </div>
+
             <div class="result-section" id="etymology-section">
                 <h3>Etymology:</h3>
                 <p id="result-etymology"></p>
             </div>
+
             <div class="result-section" id="examples-section">
-                <h3>Example Sentences:</h3>
+                 <div class="section-header">
+                    <h3>Example Sentences:</h3>
+                    <!-- NEW: More Examples Button -->
+                    <button id="more-examples-button" class="action-button">More Examples</button>
+                </div>
                 <div id="result-examples"></div>
             </div>
-            <div class="result-section" id="turkish-section">
-                <h3>Turkish Meaning:</h3>
-                <p id="result-turkish"></p>
+
+            <div class="result-section" id="language-section">
+                <!-- Title will be set dynamically by JS -->
+                <h3 id="language-title">Turkish Meaning:</h3>
+                <p id="result-language"></p>
             </div>
         </div>
     </main>

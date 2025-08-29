@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dictionary</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <main class="container">
         <h1>Dictionary</h1>
+        <p class="subtitle">Explore words with the power of AI</p>
         <form id="search-form">
             <input type="text" id="search-input" placeholder="Enter a word..." required>
             <button type="submit">Search</button>
@@ -22,33 +23,39 @@
         <div id="error-message" class="error-message hidden"></div>
 
         <div id="results-container" class="hidden">
+            <!-- The new image element goes here -->
+            <div id="result-image-container" class="hidden">
+                <img id="result-image" src="" alt="Image related to the searched word">
+            </div>
+
             <h2 id="result-word"></h2>
-            <div id="pronunciation-section">
+
+            <div class="result-section" id="pronunciation-section">
                 <h3>Pronunciation:</h3>
                 <p id="result-pronunciation"></p>
                 <button id="speak-button" title="Listen to pronunciation">🔊</button>
             </div>
-            <div id="definitions-section">
+            <div class="result-section" id="definitions-section">
                 <h3>Definitions:</h3>
                 <div id="result-definitions"></div>
             </div>
-            <div id="synonyms-section">
+            <div class="result-section" id="synonyms-section">
                 <h3>Synonyms:</h3>
                 <p id="result-synonyms"></p>
             </div>
-            <div id="antonyms-section">
+            <div class="result-section" id="antonyms-section">
                 <h3>Antonyms:</h3>
                 <p id="result-antonyms"></p>
             </div>
-            <div id="etymology-section">
+            <div class="result-section" id="etymology-section">
                 <h3>Etymology:</h3>
                 <p id="result-etymology"></p>
             </div>
-            <div id="examples-section">
+            <div class="result-section" id="examples-section">
                 <h3>Example Sentences:</h3>
                 <div id="result-examples"></div>
             </div>
-            <div id="turkish-section">
+            <div class="result-section" id="turkish-section">
                 <h3>Turkish Meaning:</h3>
                 <p id="result-turkish"></p>
             </div>

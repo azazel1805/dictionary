@@ -51,47 +51,53 @@ form.addEventListener('submit', async (e) => {
 });
 
 /**
- * FINAL, GUARANTEED PARSER (Version 4)
- * This function first splits the entire text into chunks based on the section headers.
- * This completely prevents content from one section bleeding into another. It is the most robust method.
+ * FINAL, ROBUST PARSER (Version 5)
+ * This version uses a powerful regular expression to match all known sections
+ * and their content, making it immune to ordering issues and internal markdown.
  */
 function parseGeminiResponse(text) {
     const sections = {};
     if (!text) return sections;
 
-    // The regex splits the text right BEFORE each section header (e.g., **Definitions:**)
-    // The (?=...) is a "positive lookahead" which means the delimiter is kept.
-    const splitRegex = /(?=\s*\*\*[A-Za-z\s]+:\*\*)/;
-    let parts = text.split(splitRegex).filter(p => p.trim() !== '');
-
-    // Handle the first part, which is usually the pronunciation if it has no header.
-    if (parts.length > 0 && !parts[0].startsWith('**')) {
-        sections.pronunciation = parts.shift().trim();
+    const knownHeaders = [
+        'Pronunciation', 'Definitions', 'Synonyms', 'Antonyms',
+        'Etymology', 'Example Sentences', 'Turkish Meaning'
+    ];
+    
+    // Create a pattern that matches any of the known headers
+    const headerPattern = knownHeaders.join('|');
+    
+    // This regex finds a header and captures all content until the next known header or the end of the string.
+    // The "g" flag is crucial for matchAll to find every occurrence.
+    const regex = new RegExp(`\\*\\*(${headerPattern}):\\*\\*([\\s\\S]*?)(?=\\s*\\*\\*(${headerPattern}):\\*\\*|$)`, "g");
+    
+    const matches = [...text.matchAll(regex)];
+    
+    for (const match of matches) {
+        const header = match[1].trim();
+        const content = match[2].trim();
+        const key = header.toLowerCase().replace(/\s(.)/g, (m, char) => char.toUpperCase());
+        sections[key] = content;
     }
-
-    // Process the rest of the parts, which are now guaranteed to be distinct sections.
-    parts.forEach(part => {
-        // Split the part into header and content
-        const [headerLine, ...contentLines] = part.split('\n');
-        const headerMatch = headerLine.match(/\*\*(.*?):\*\*/);
-
-        if (headerMatch && headerMatch[1]) {
-            const header = headerMatch[1].trim();
-            const content = contentLines.join('\n').trim();
-
-            // Convert header to camelCase for the object key
-            const key = header.toLowerCase().replace(/\s(.)/g, (m, char) => char.toUpperCase());
-            sections[key] = content;
+    
+    // Special case: If Pronunciation was not found as a header,
+    // check if there's text before the very first matched section.
+    if (!sections.pronunciation && matches.length > 0) {
+        const firstMatchIndex = text.indexOf(matches[0][0]);
+        if (firstMatchIndex > 0) {
+            const potentialPronunciation = text.substring(0, firstMatchIndex).trim();
+            if (potentialPronunciation) {
+                sections.pronunciation = potentialPronunciation;
+            }
         }
-    });
+    }
 
     return sections;
 }
 
-
 /**
  * DISPLAY FUNCTION
- * This function now correctly formats multi-line text into clean HTML lists.
+ * Cleans and formats the parsed content for display.
  */
 function displayResults(word, data, imageUrl) {
     if (imageUrl && !imageUrl.includes("1528459801416")) { 
@@ -104,25 +110,27 @@ function displayResults(word, data, imageUrl) {
 
     resultWord.textContent = word;
 
-    const formatToList = (content) => {
-        if (!content) return '<p>N/A</p>';
-        const items = content.split('\n').filter(item => item.trim() !== '');
-        if (items.length === 0) return '<p>N/A</p>';
-
-        // Create a clean list, removing any leading list markers from the raw text
-        return `<ul>${items.map(item => `<li>${item.trim().replace(/^\s*(\*|-|\d+\.)\s*/, '')}</li>`).join('')}</ul>`;
+    const formatContent = (content, isList = false) => {
+        if (!content || content.trim() === '' || content.trim() === '-') return '<p>N/A</p>';
+        
+        if (isList) {
+            const items = content.split('\n').filter(item => item.trim() !== '');
+            if (items.length === 0) return '<p>N/A</p>';
+            // Clean up each item and wrap in <li> tags
+            return `<ul>${items.map(item => `<li>${item.trim().replace(/^\s*(\*|-|\d+\.)\s*/, '')}</li>`).join('')}</ul>`;
+        } else {
+            // For single-line content, just put it in a paragraph
+            return `<p>${content.replace(/\*/g, '')}</p>`;
+        }
     };
-    
-    const formatToParagraph = (content) => `<p>${content || 'N/A'}</p>`;
 
-    // Update each section using specific selectors and the correct formatter
     document.querySelector("#pronunciation-section p").innerHTML = data.pronunciation || 'N/A';
-    document.querySelector("#definitions-section div").innerHTML = formatToList(data.definitions);
-    document.querySelector("#synonyms-section p").innerHTML = formatToParagraph(data.synonyms);
-    document.querySelector("#antonyms-section p").innerHTML = formatToParagraph(data.antonyms);
-    document.querySelector("#etymology-section p").innerHTML = formatToParagraph(data.etymology);
-    document.querySelector("#examples-section div").innerHTML = formatToList(data.exampleSentences);
-    document.querySelector("#turkish-section p").innerHTML = formatToParagraph(data.turkishMeaning);
+    document.querySelector("#definitions-section div").innerHTML = formatContent(data.definitions, true);
+    document.querySelector("#synonyms-section p").innerHTML = formatContent(data.synonyms);
+    document.querySelector("#antonyms-section p").innerHTML = formatContent(data.antonyms);
+    document.querySelector("#etymology-section p").innerHTML = formatContent(data.etymology);
+    document.querySelector("#examples-section div").innerHTML = formatContent(data.exampleSentences, true);
+    document.querySelector("#turkish-section p").innerHTML = formatContent(data.turkishMeaning);
     
     speakButton.onclick = () => {
         if (synth.speaking) synth.cancel();

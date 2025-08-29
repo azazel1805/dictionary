@@ -1,0 +1,3 @@
+# This file tells Netlify where your serverless functions are.
+[functions]
+  directory = "netlify/functions"

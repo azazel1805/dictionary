@@ -1,0 +1,147 @@
+:root {
+    --bg-color: #121212;
+    --primary-text-color: #e0e0e0;
+    --secondary-text-color: #b0b0b0;
+    --card-bg-color: rgba(30, 30, 30, 0.85);
+    --accent-color: #bb86fc;
+    --border-color: #444;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--primary-text-color);
+    margin: 0;
+    padding: 20px;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    transition: background-image 1s ease-in-out;
+}
+
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: var(--card-bg-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+h1 {
+    font-family: 'Merriweather', serif;
+    text-align: center;
+    color: var(--accent-color);
+    margin-bottom: 30px;
+}
+
+#search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+#search-input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: #2a2a2a;
+    color: var(--primary-text-color);
+}
+
+#search-form button {
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--accent-color);
+    color: #121212;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#search-form button:hover {
+    background-color: #a062f8;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#results-container h2 {
+    font-family: 'Merriweather', serif;
+    font-size: 2.5rem;
+    margin-top: 0;
+    color: white;
+}
+
+#results-container h3 {
+    font-family: 'Merriweather', serif;
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 5px;
+    margin-top: 25px;
+}
+
+#results-container p, #results-container div {
+    line-height: 1.7;
+    color: var(--secondary-text-color);
+}
+
+#pronunciation-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#pronunciation-section h3 {
+    border: none;
+    margin: 0;
+}
+
+#speak-button {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0;
+    color: var(--secondary-text-color);
+    transition: color 0.3s ease;
+}
+
+#speak-button:hover {
+    color: var(--accent-color);
+}
+
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--accent-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 30px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    text-align: center;
+    color: #ff6b6b;
+    background-color: rgba(255, 107, 107, 0.1);
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ff6b6b;
+}
+
+ul, ol {
+    padding-left: 20px;
+}

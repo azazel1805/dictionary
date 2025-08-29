@@ -15,6 +15,10 @@ const resultExamples = document.getElementById('result-examples');
 const resultTurkish = document.getElementById('result-turkish');
 const speakButton = document.getElementById('speak-button');
 
+// NEW: Get references to the image elements
+const resultImageContainer = document.getElementById('result-image-container');
+const resultImage = document.getElementById('result-image');
+
 // Web Speech API
 const synth = window.speechSynthesis;
 
@@ -37,7 +41,6 @@ form.addEventListener('submit', async (e) => {
         
         const data = await response.json();
         
-        // HELPFUL FOR DEBUGGING: See the exact text coming from the API
         console.log("Raw text from Gemini:", data.dictionaryData);
 
         const parsedData = parseGeminiResponse(data.dictionaryData);
@@ -68,8 +71,6 @@ function parseGeminiResponse(text) {
     ];
 
     keys.forEach(key => {
-        // UPDATED REGEX: Now looks for markdown bolding (**) around the key,
-        // making it compatible with gemini-1.5-flash.
         const regex = new RegExp(`\\*\\*${key}:\\*\\*\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "is");
         const match = text.match(regex);
 
@@ -85,12 +86,15 @@ function parseGeminiResponse(text) {
     return sections;
 }
 
-
 function displayResults(word, data, imageUrl) {
-    if (imageUrl) {
-        document.body.style.backgroundImage = `url(${imageUrl})`;
+    // UPDATED: Handle the new image element
+    // Check if the imageUrl is the generic default one or a real one.
+    if (imageUrl && !imageUrl.includes("1528459801416")) { 
+        resultImage.src = imageUrl;
+        resultImage.alt = `An image related to the word "${word}"`;
+        resultImageContainer.classList.remove('hidden');
     } else {
-        document.body.style.backgroundImage = 'none';
+        resultImageContainer.classList.add('hidden');
     }
 
     resultWord.textContent = word;

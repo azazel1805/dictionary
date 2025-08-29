@@ -42,13 +42,68 @@ h1 {
 .subtitle {
     text-align: center;
     color: var(--secondary-text-color);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
+/* --- NEW: Settings & History Styles --- */
+.settings-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
+}
+
+#language-select {
+    background-color: #2a2a2a;
+    color: var(--primary-text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+}
+
+#history-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+#history-container h3 {
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
+    font-weight: normal;
+}
+
+#history-list {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.history-item {
+    background-color: #333;
+    color: var(--secondary-text-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.history-item:hover {
+    background-color: var(--accent-color);
+    color: #121212;
+}
+
+/* --- Form Styles --- */
 #search-form {
     display: flex;
     gap: 0.75rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 #search-input {
@@ -88,10 +143,21 @@ h1 {
     display: none !important;
 }
 
-/* --- New Image Styles --- */
+/* --- Results Styling --- */
+/* NEW: Animation Classes */
+#results-container {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+#results-container.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 #result-image-container {
     width: 100%;
-    height: 250px; /* Consistent height for the image area */
+    height: 250px;
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 2rem;
@@ -100,16 +166,16 @@ h1 {
 #result-image {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Prevents image from stretching */
+    object-fit: cover;
     display: block;
 }
 
-/* --- Results Styling --- */
 #results-container h2 {
     font-family: 'Merriweather', serif;
     font-size: 3rem;
     color: white;
     margin-bottom: 1rem;
+    text-transform: capitalize;
 }
 
 .result-section {
@@ -123,16 +189,62 @@ h1 {
     padding-bottom: 0;
 }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
 .result-section h3 {
     font-family: 'Merriweather', serif;
     color: var(--accent-color);
-    margin-bottom: 0.5rem;
     font-size: 1.25rem;
 }
 
 .result-section p, .result-section div {
     color: var(--secondary-text-color);
 }
+
+/* NEW: Action Button Styles */
+.action-button {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--secondary-text-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+.action-button:hover {
+    background-color: #333;
+    border-color: var(--secondary-text-color);
+}
+.action-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+
+/* NEW: Clickable Synonym/Antonym Styles */
+#result-synonyms button, #result-antonyms button {
+    background-color: transparent;
+    border: 1px solid #444;
+    color: var(--secondary-text-color);
+    padding: 0.25rem 0.75rem;
+    margin: 0.25rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+#result-synonyms button:hover, #result-antonyms button:hover {
+    background-color: var(--accent-hover-color);
+    border-color: var(--accent-hover-color);
+    color: #121212;
+}
+
 
 #pronunciation-section {
     display: flex;
@@ -141,7 +253,7 @@ h1 {
 }
 
 #pronunciation-section h3 {
-    margin-bottom: 0; /* Override default margin */
+    margin-bottom: 0;
 }
 
 #speak-button {
@@ -182,26 +294,14 @@ h1 {
     border: 1px solid var(--error-color);
 }
 
-/* --- Mobile Friendliness (Responsive Design) --- */
 @media (max-width: 768px) {
     .container {
         margin: 1rem;
         padding: 1.5rem;
     }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    #results-container h2 {
-        font-size: 2.5rem;
-    }
-
-    #search-form {
-        flex-direction: column;
-    }
-
-    #result-image-container {
-        height: 200px;
-    }
+    h1 { font-size: 2rem; }
+    #results-container h2 { font-size: 2.5rem; }
+    #search-form { flex-direction: column; }
+    #result-image-container { height: 200px; }
+    .section-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
 }

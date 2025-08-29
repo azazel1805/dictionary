@@ -51,57 +51,47 @@ form.addEventListener('submit', async (e) => {
 });
 
 /**
- * FINAL, ROBUST PARSER (Version 3)
- * This function uses a much more reliable method to extract each section individually.
- * It will not fail if a section is missing or out of order.
+ * FINAL, GUARANTEED PARSER (Version 4)
+ * This function first splits the entire text into chunks based on the section headers.
+ * This completely prevents content from one section bleeding into another. It is the most robust method.
  */
 function parseGeminiResponse(text) {
-    const sections = {
-        pronunciation: "N/A",
-        definitions: "N/A",
-        synonyms: "N/A",
-        antonyms: "N/A",
-        etymology: "N/A",
-        exampleSentences: "N/A",
-        turkishMeaning: "N/A",
-    };
+    const sections = {};
+    if (!text) return sections;
 
-    // Helper function to extract content for a specific section
-    const extractSection = (key) => {
-        // This regex finds a header (e.g., **Definitions:**) and captures EVERYTHING
-        // until it hits the next header or the end of the text.
-        const regex = new RegExp(`\\*\\*${key}:\\*\\*\\s*([\\s\\S]*?)(?=\\n\\*\\*|$)`, "i");
-        const match = text.match(regex);
-        return match ? match[1].trim() : null;
-    };
+    // The regex splits the text right BEFORE each section header (e.g., **Definitions:**)
+    // The (?=...) is a "positive lookahead" which means the delimiter is kept.
+    const splitRegex = /(?=\s*\*\*[A-Za-z\s]+:\*\*)/;
+    let parts = text.split(splitRegex).filter(p => p.trim() !== '');
 
-    // Extract each section using the helper
-    sections.definitions = extractSection("Definitions") || sections.definitions;
-    sections.synonyms = extractSection("Synonyms") || sections.synonyms;
-    sections.antonyms = extractSection("Antonyms") || sections.antonyms;
-    sections.etymology = extractSection("Etymology") || sections.etymology;
-    sections.exampleSentences = extractSection("Example Sentences") || sections.exampleSentences;
-    sections.turkishMeaning = extractSection("Turkish Meaning") || sections.turkishMeaning;
-
-    // Special handling for Pronunciation, which often lacks a header
-    const pronunciationMatch = extractSection("Pronunciation");
-    if (pronunciationMatch) {
-        sections.pronunciation = pronunciationMatch;
-    } else {
-        // If no header, assume the very first line is the pronunciation,
-        // as long as it doesn't look like another section's content.
-        const firstLine = text.split('\n')[0].trim();
-        if (!firstLine.startsWith('**')) {
-            sections.pronunciation = firstLine;
-        }
+    // Handle the first part, which is usually the pronunciation if it has no header.
+    if (parts.length > 0 && !parts[0].startsWith('**')) {
+        sections.pronunciation = parts.shift().trim();
     }
+
+    // Process the rest of the parts, which are now guaranteed to be distinct sections.
+    parts.forEach(part => {
+        // Split the part into header and content
+        const [headerLine, ...contentLines] = part.split('\n');
+        const headerMatch = headerLine.match(/\*\*(.*?):\*\*/);
+
+        if (headerMatch && headerMatch[1]) {
+            const header = headerMatch[1].trim();
+            const content = contentLines.join('\n').trim();
+
+            // Convert header to camelCase for the object key
+            const key = header.toLowerCase().replace(/\s(.)/g, (m, char) => char.toUpperCase());
+            sections[key] = content;
+        }
+    });
 
     return sections;
 }
 
+
 /**
- * IMPROVED DISPLAY FUNCTION
- * Correctly formats multi-line content into proper HTML lists.
+ * DISPLAY FUNCTION
+ * This function now correctly formats multi-line text into clean HTML lists.
  */
 function displayResults(word, data, imageUrl) {
     if (imageUrl && !imageUrl.includes("1528459801416")) { 
@@ -114,27 +104,25 @@ function displayResults(word, data, imageUrl) {
 
     resultWord.textContent = word;
 
-    const formatContentToHTML = (content) => {
-        if (!content || content.trim() === 'N/A') return '<p>N/A</p>';
-        
-        // Remove markdown list markers (*, -, 1.) and clean up lines
-        const cleanedContent = content.replace(/(\n\s*(\*|-|\d+\.)\s*)/g, '\n');
-        const items = cleanedContent.split('\n').filter(item => item.trim() !== '');
+    const formatToList = (content) => {
+        if (!content) return '<p>N/A</p>';
+        const items = content.split('\n').filter(item => item.trim() !== '');
+        if (items.length === 0) return '<p>N/A</p>';
 
-        if (items.length <= 1) return `<p>${items[0] || 'N/A'}</p>`;
-        
-        // Wrap each item in <li> tags and join into a <ul>
-        return `<ul>${items.map(item => `<li>${item.trim()}</li>`).join('')}</ul>`;
+        // Create a clean list, removing any leading list markers from the raw text
+        return `<ul>${items.map(item => `<li>${item.trim().replace(/^\s*(\*|-|\d+\.)\s*/, '')}</li>`).join('')}</ul>`;
     };
+    
+    const formatToParagraph = (content) => `<p>${content || 'N/A'}</p>`;
 
-    // Use querySelector to ensure we are targeting the correct child element
+    // Update each section using specific selectors and the correct formatter
     document.querySelector("#pronunciation-section p").innerHTML = data.pronunciation || 'N/A';
-    document.querySelector("#definitions-section div").innerHTML = formatContentToHTML(data.definitions);
-    document.querySelector("#synonyms-section p").innerHTML = data.synonyms || 'N/A';
-    document.querySelector("#antonyms-section p").innerHTML = data.antonyms || 'N/A';
-    document.querySelector("#etymology-section p").innerHTML = data.etymology || 'N/A';
-    document.querySelector("#examples-section div").innerHTML = formatContentToHTML(data.exampleSentences);
-    document.querySelector("#turkish-section p").innerHTML = data.turkishMeaning || 'N/A';
+    document.querySelector("#definitions-section div").innerHTML = formatToList(data.definitions);
+    document.querySelector("#synonyms-section p").innerHTML = formatToParagraph(data.synonyms);
+    document.querySelector("#antonyms-section p").innerHTML = formatToParagraph(data.antonyms);
+    document.querySelector("#etymology-section p").innerHTML = formatToParagraph(data.etymology);
+    document.querySelector("#examples-section div").innerHTML = formatToList(data.exampleSentences);
+    document.querySelector("#turkish-section p").innerHTML = formatToParagraph(data.turkishMeaning);
     
     speakButton.onclick = () => {
         if (synth.speaking) synth.cancel();

@@ -1,77 +1,79 @@
-// Import the Google AI SDK
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Access your API keys from environment variables
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
-// Initialize the Gemini client
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
 exports.handler = async function (event, context) {
-  // Get the word from the query parameter
-  const { word } = event.queryStringParameters;
+  const { word, mode, language = 'Turkish' } = event.queryStringParameters;
 
   if (!word) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Word parameter is required." }),
-    };
+    return { statusCode: 400, body: JSON.stringify({ error: "Word parameter is required." }) };
   }
 
   try {
-    // --- 1. Fetch data from Gemini API ---
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" }); 
-    const prompt = `
-      Provide a detailed dictionary entry for the word or phrase: "${word}"
-
-      Include the following sections clearly labeled EXACTLY as shown:
-      - Pronunciation: [Provide phonetic spelling or IPA here, e.g., /prəˌnʌnsiˈeɪʃən/ or pruh-nuhn-see-AY-shuhn]
-      - Definitions: [List all common meanings...]
-      - Synonyms: [...]
-      - Antonyms: [...]
-      - Etymology: [...]
-      - Example Sentences: [...]
-      - Turkish Meaning: [...]
-    `;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const dictionaryText = response.text();
-
-    // --- 2. Fetch the TOP RATED background image from Unsplash API ---
-    // UPDATED: Changed from /photos/random to /search/photos for better relevance.
-    const unsplashUrl = `https://api.unsplash.com/search/photos?query=${word}&per_page=1&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`;
+    // --- MODE SWITCHING ---
+    // We decide what to do based on the 'mode' parameter from the frontend
     
-    // A nice, neutral default background image
-    let imageUrl = "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?q=80&w=1912&auto=format&fit=crop"; 
+    // Mode 1: Full dictionary search (default)
+    if (!mode || mode === 'search') {
+      const prompt = `
+        Provide a detailed dictionary entry for the word or phrase: "${word}"
 
-    try {
-        const imageResponse = await fetch(unsplashUrl);
-        if (imageResponse.ok) {
-            const imageData = await imageResponse.json();
-            // UPDATED: The response for a search is an object with a 'results' array.
-            // We check if the array exists and has at least one item.
-            if (imageData.results && imageData.results.length > 0) {
-                // We take the URL of the VERY FIRST image in the results.
-                imageUrl = imageData.results[0].urls.regular;
-            }
+        Include the following sections clearly labeled EXACTLY as shown with markdown bolding:
+        **Pronunciation:** [Provide phonetic spelling or IPA here]
+        **Definitions:** [List all common meanings]
+        **Synonyms:** [Provide a comma-separated list]
+        **Antonyms:** [Provide a comma-separated list]
+        **Etymology:** [Provide a brief etymology]
+        **Example Sentences:** [List several example sentences]
+        **${language} Meaning:** [Provide the meaning in ${language}]
+      `;
+
+      const [geminiResult, imageResponse] = await Promise.all([
+        model.generateContent(prompt),
+        fetch(`https://api.unsplash.com/search/photos?query=${word}&per_page=1&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`)
+      ]);
+      
+      const dictionaryText = geminiResult.response.text();
+      let imageUrl = null;
+      if (imageResponse.ok) {
+        const imageData = await imageResponse.json();
+        if (imageData.results && imageData.results.length > 0) {
+          imageUrl = imageData.results[0].urls.regular;
         }
-    } catch (e) {
-        console.error("Unsplash API call failed, using default background.", e);
+      }
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ dictionaryData: dictionaryText, imageUrl }),
+      };
     }
 
-    // --- 3. Return both results to the frontend ---
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ dictionaryData: dictionaryText, imageUrl: imageUrl }),
-    };
+    // Mode 2: Explain Like I'm 5
+    if (mode === 'eli5') {
+      const prompt = `Explain the word "${word}" in one simple sentence that a five-year-old could easily understand.`;
+      const result = await model.generateContent(prompt);
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ resultText: result.response.text() }),
+      };
+    }
+
+    // Mode 3: More Examples
+    if (mode === 'moreExamples') {
+      const prompt = `Generate three new and creative example sentences for the word "${word}".`;
+      const result = await model.generateContent(prompt);
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ resultText: result.response.text() }),
+      };
+    }
 
   } catch (error) {
     console.error("API call error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Failed to fetch data from APIs." }),
-    };
+    return { statusCode: 500, body: JSON.stringify({ error: "Failed to fetch data from APIs." }) };
   }
 };

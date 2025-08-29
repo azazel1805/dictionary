@@ -7,7 +7,6 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
 exports.handler = async function (event, context) {
-  // CORRECTION: Ensure language has a default value if not provided.
   const { word, mode, language = 'Turkish' } = event.queryStringParameters;
 
   if (!word) {
@@ -15,8 +14,8 @@ exports.handler = async function (event, context) {
   }
 
   try {
+    // --- MODE: Full dictionary search ---
     if (!mode || mode === 'search') {
-      // CORRECTION: The language variable is now correctly placed in the prompt.
       const prompt = `
         Provide a detailed dictionary entry for the word or phrase: "${word}"
 
@@ -50,22 +49,17 @@ exports.handler = async function (event, context) {
       };
     }
 
+    // --- OTHER MODES (ELI5, moreExamples) ---
     if (mode === 'eli5') {
       const prompt = `Explain the word "${word}" in one simple sentence that a five-year-old could easily understand.`;
       const result = await model.generateContent(prompt);
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ resultText: result.response.text() }),
-      };
+      return { statusCode: 200, body: JSON.stringify({ resultText: result.response.text() }) };
     }
 
     if (mode === 'moreExamples') {
       const prompt = `Generate three new and creative example sentences for the word "${word}".`;
       const result = await model.generateContent(prompt);
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ resultText: result.response.text() }),
-      };
+      return { statusCode: 200, body: JSON.stringify({ resultText: result.response.text() }) };
     }
 
   } catch (error) {

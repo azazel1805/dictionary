@@ -21,7 +21,6 @@ exports.handler = async function (event, context) {
 
   try {
     // --- 1. Fetch data from Gemini API ---
-    // UPDATED: Using the gemini-1.5-flash-latest model
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" }); 
     const prompt = `
       Provide a detailed dictionary entry for the word or phrase: "${word}"
@@ -40,16 +39,22 @@ exports.handler = async function (event, context) {
     const response = await result.response;
     const dictionaryText = response.text();
 
-    // --- 2. Fetch a background image from Unsplash API (Robust Version) ---
-    const unsplashUrl = `https://api.unsplash.com/photos/random?query=${word}&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`;
+    // --- 2. Fetch the TOP RATED background image from Unsplash API ---
+    // UPDATED: Changed from /photos/random to /search/photos for better relevance.
+    const unsplashUrl = `https://api.unsplash.com/search/photos?query=${word}&per_page=1&orientation=landscape&client_id=${UNSPLASH_ACCESS_KEY}`;
+    
+    // A nice, neutral default background image
     let imageUrl = "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?q=80&w=1912&auto=format&fit=crop"; 
 
     try {
         const imageResponse = await fetch(unsplashUrl);
         if (imageResponse.ok) {
             const imageData = await imageResponse.json();
-            if (imageData?.urls?.regular) {
-                imageUrl = imageData.urls.regular;
+            // UPDATED: The response for a search is an object with a 'results' array.
+            // We check if the array exists and has at least one item.
+            if (imageData.results && imageData.results.length > 0) {
+                // We take the URL of the VERY FIRST image in the results.
+                imageUrl = imageData.results[0].urls.regular;
             }
         }
     } catch (e) {

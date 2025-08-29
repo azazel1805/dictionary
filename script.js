@@ -110,7 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const sections = {};
         if (!text) return sections;
 
-        const knownHeaders = ['Pronunciation', 'Definitions', 'Synonyms', 'Antonyms', 'Etymology', 'Example Sentences', languageSelect.value + ' Meaning'];
+        const selectedLanguage = languageSelect.value;
+    const knownHeaders = ['Pronunciation', 'Definitions', 'Synonyms', 'Antonyms', 'Etymology', 'Example Sentences', `${selectedLanguage} Meaning`];
         const headerPattern = knownHeaders.join('|').replace(/ /g, '\\s');
         const regex = new RegExp(`\\*\\*(${headerPattern}):\\*\\*([\\s\\S]*?)(?=\\s*\\*\\*(${headerPattern}):\\*\\*|$)`, "g");
         

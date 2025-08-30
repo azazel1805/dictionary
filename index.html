@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Powered Dictionary</title>
+    <title>Dictionary</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
 </head>
 <body>
     <main class="container">
-        <h1>AI Dictionary</h1>
+        <h1>Dictionary</h1>
         <p class="subtitle">Explore words with the power of AI</p>
 
         <div class="settings-container">
@@ -31,7 +31,6 @@
             <button type="submit">Search</button>
         </form>
 
-        <!-- NEW: Word Comparison Tool -->
         <form id="compare-form">
             <fieldset>
                 <legend>Word vs. Word</legend>
@@ -52,7 +51,6 @@
         <div id="loader" class="loader hidden"></div>
         <div id="error-message" class="error-message hidden"></div>
         
-        <!-- NEW: Comparison Results Container -->
         <div id="compare-results-container" class="hidden">
             <h2 id="compare-title"></h2>
             <div id="compare-content" class="result-section"></div>
@@ -65,17 +63,49 @@
 
             <h2 id="result-word"></h2>
 
-            <!-- ... (Pronunciation, Definitions, etc. remain the same) ... -->
-            <div class="result-section" id="pronunciation-section">...</div>
-            <div class="result-section" id="definitions-section">...</div>
-            <div class="result-section" id="synonyms-section">...</div>
-            <div class="result-section" id="antonyms-section">...</div>
-            <div class="result-section" id="etymology-section">...</div>
-            <div class="result-section" id="examples-section">...</div>
-            <div class="result-section" id="language-section">...</div>
+            <div class="result-section" id="pronunciation-section">
+                <h3>Pronunciation:</h3>
+                <p id="result-pronunciation"></p>
+                <button id="speak-button" title="Listen to pronunciation">🔊</button>
+            </div>
 
-            <!-- NEW: Grammar & Usage Validator -->
-            <div id="grammar-validator" class="result-section hidden">
+            <div class="result-section" id="definitions-section">
+                <div class="section-header">
+                    <h3>Definitions:</h3>
+                    <button id="eli5-button" class="action-button">Explain Like I'm 5</button>
+                </div>
+                <div id="result-definitions"></div>
+            </div>
+
+            <div class="result-section" id="synonyms-section">
+                <h3>Synonyms:</h3>
+                <div id="result-synonyms"></div>
+            </div>
+
+            <div class="result-section" id="antonyms-section">
+                <h3>Antonyms:</h3>
+                <div id="result-antonyms"></div>
+            </div>
+
+            <div class="result-section" id="etymology-section">
+                <h3>Etymology:</h3>
+                <p id="result-etymology"></p>
+            </div>
+
+            <div class="result-section" id="examples-section">
+                 <div class="section-header">
+                    <h3>Example Sentences:</h3>
+                    <button id="more-examples-button" class="action-button">More Examples</button>
+                </div>
+                <div id="result-examples"></div>
+            </div>
+
+            <div class="result-section" id="language-section">
+                <h3 id="language-title">Turkish Meaning:</h3>
+                <p id="result-language"></p>
+            </div>
+
+            <div id="grammar-validator" class="result-section">
                 <h3>Check Your Sentence</h3>
                 <p>Use "<span class="current-word-display"></span>" in a sentence to check your understanding.</p>
                 <div class="validator-form">

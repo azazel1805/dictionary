@@ -305,3 +305,128 @@ h1 {
     #result-image-container { height: 200px; }
     .section-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
 }
+/* --- NEW: Word Comparison Styles --- */
+#compare-form fieldset {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+#compare-form legend {
+    padding: 0 0.5rem;
+    color: var(--secondary-text-color);
+    font-size: 0.9rem;
+}
+
+#compare-form .compare-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+#compare-form .compare-inputs input {
+    width: 100%;
+    background-color: #2a2a2a;
+    color: var(--primary-text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+}
+
+#compare-form button {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #333;
+    color: var(--primary-text-color);
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#compare-form button:hover {
+    background-color: #444;
+}
+
+#compare-results-container {
+    margin-top: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+#compare-results-container h2 {
+    font-family: 'Merriweather', serif;
+    font-size: 2rem;
+}
+
+/* --- NEW: Grammar Validator Styles --- */
+#grammar-validator p {
+    margin-bottom: 1rem;
+}
+
+#grammar-validator .current-word-display {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.validator-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+#sentence-input {
+    width: 100%;
+    background-color: #2a2a2a;
+    color: var(--primary-text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+#validate-sentence-button {
+    align-self: flex-end;
+    background-color: var(--accent-color);
+    color: #121212;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+#validate-sentence-button:hover {
+    background-color: var(--accent-hover-color);
+}
+#validate-sentence-button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+#validation-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: rgba(187, 134, 252, 0.05);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 4px;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+    #compare-form .compare-inputs {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #compare-form .compare-inputs span {
+        text-align: center;
+        margin: 0.5rem 0;
+    }
+}

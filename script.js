@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ELEMENT REFERENCES ---
     const form = document.getElementById('search-form');
     const input = document.getElementById('search-input');
-    const resultsContainer = document.getElementById('results-container');
+    const languageSelect = document.getElementById('language-select');
     const loader = document.getElementById('loader');
     const errorMessage = document.getElementById('error-message');
-    const languageSelect = document.getElementById('language-select');
-
+    
+    const resultsContainer = document.getElementById('results-container');
     const resultWord = document.getElementById('result-word');
     const resultPronunciation = document.getElementById('result-pronunciation');
     const resultDefinitions = document.getElementById('result-definitions');
@@ -27,6 +27,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const historyContainer = document.getElementById('history-container');
     const historyList = document.getElementById('history-list');
 
+    const compareForm = document.getElementById('compare-form');
+    const compareInput1 = document.getElementById('compare-input-1');
+    const compareInput2 = document.getElementById('compare-input-2');
+    const compareResultsContainer = document.getElementById('compare-results-container');
+    const compareTitle = document.getElementById('compare-title');
+    const compareContent = document.getElementById('compare-content');
+
+    const grammarValidator = document.getElementById('grammar-validator');
+    const sentenceInput = document.getElementById('sentence-input');
+    const validateSentenceButton = document.getElementById('validate-sentence-button');
+    const validationResult = document.getElementById('validation-result');
+    const currentWordDisplays = document.querySelectorAll('.current-word-display');
+
     const synth = window.speechSynthesis;
     let currentWord = '';
 
@@ -41,6 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (word) performSearch(word);
     });
 
+    compareForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const word1 = compareInput1.value.trim();
+        const word2 = compareInput2.value.trim();
+        if (word1 && word2) performComparison(word1, word2);
+    });
+
+    validateSentenceButton.addEventListener('click', validateSentence);
     eli5Button.addEventListener('click', () => fetchExtraData('eli5'));
     moreExamplesButton.addEventListener('click', () => fetchExtraData('moreExamples'));
 
@@ -48,6 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function performSearch(word) {
         currentWord = word;
         input.value = word;
+        
+        compareResultsContainer.classList.add('hidden');
         resultsContainer.classList.remove('visible');
         resultsContainer.classList.add('hidden');
         errorMessage.classList.add('hidden');
@@ -59,10 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
             
             const data = await response.json();
-            // Critical Debugging Line:
-            console.log("--- RAW TEXT FROM GEMINI ---\n", data.dictionaryData, "\n--------------------------");
-            
             const parsedData = parseGeminiResponse(data.dictionaryData);
+            
             displayResults(word, parsedData, data.imageUrl);
             saveHistory(word);
             renderHistory();
@@ -75,6 +96,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    async function performComparison(word1, word2) {
+        resultsContainer.classList.remove('visible');
+        resultsContainer.classList.add('hidden');
+        errorMessage.classList.add('hidden');
+        loader.classList.remove('hidden');
+
+        try {
+            const response = await fetch(`/.netlify/functions/fetchData?mode=compare&word1=${encodeURIComponent(word1)}&word2=${encodeURIComponent(word2)}`);
+            if (!response.ok) throw new Error('Failed to fetch comparison');
+            
+            const data = await response.json();
+            
+            compareTitle.textContent = `${word1} vs. ${word2}`;
+            const formattedText = data.resultText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+            compareContent.innerHTML = formattedText;
+            compareResultsContainer.classList.remove('hidden');
+
+        } catch (error) {
+            showError("Sorry, something went wrong with the comparison.");
+        } finally {
+            loader.classList.add('hidden');
+        }
+    }
+
+    async function validateSentence() {
+        const userSentence = sentenceInput.value.trim();
+        if (!userSentence) return;
+        
+        const originalButtonText = validateSentenceButton.textContent;
+        validateSentenceButton.textContent = 'Checking...';
+        validateSentenceButton.disabled = true;
+        validationResult.classList.add('hidden');
+
+        try {
+            const response = await fetch(`/.netlify/functions/fetchData?mode=validate&word=${encodeURIComponent(currentWord)}&userSentence=${encodeURIComponent(userSentence)}`);
+            if (!response.ok) throw new Error('Failed to fetch validation');
+            
+            const data = await response.json();
+            validationResult.innerHTML = data.resultText.replace(/\n/g, '<br>');
+            validationResult.classList.remove('hidden');
+
+        } catch (error) {
+            validationResult.textContent = "Sorry, couldn't check the sentence.";
+            validationResult.classList.remove('hidden');
+        } finally {
+            validateSentenceButton.textContent = originalButtonText;
+            validateSentenceButton.disabled = false;
+        }
+    }
+
     async function fetchExtraData(mode) {
         const button = mode === 'eli5' ? eli5Button : moreExamplesButton;
         const originalText = button.textContent;
@@ -105,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // THIS IS THE FINAL, CORRECTED PARSER
     function parseGeminiResponse(text) {
         const sections = {};
         if (!text) return sections;
@@ -122,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let header = match[1].trim();
             const content = match[2].trim();
             
-            // Use a generic key 'languageMeaning' for any translation
             if (header === `${selectedLanguage} Meaning`) {
                 sections.languageMeaning = content;
             } else {
@@ -171,6 +240,11 @@ document.addEventListener('DOMContentLoaded', () => {
             synth.speak(utterance);
         };
 
+        grammarValidator.classList.remove('hidden');
+        currentWordDisplays.forEach(span => span.textContent = word);
+        sentenceInput.value = '';
+        validationResult.classList.add('hidden');
+
         resultsContainer.classList.remove('hidden');
         setTimeout(() => resultsContainer.classList.add('visible'), 10);
     }
@@ -181,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const items = content.split('\n').filter(item => item.trim() !== '');
             return `<ul>${items.map(item => `<li>${item.trim().replace(/^\s*(\*|-|\d+\.)\s*/, '')}</li>`).join('')}</ul>`;
         }
-        return `<p>${content}</p>`;
+        return `<p>${content.replace(/\*/g, '')}</p>`;
     }
     
     function createClickableItems(container, text) {

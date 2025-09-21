@@ -1,12 +1,12 @@
 :root {
-    --bg-color: #121212;
-    --card-color: #1e1e1e;
-    --border-color: #333333;
-    --primary-text-color: #e0e0e0;
-    --secondary-text-color: #a0a0a0;
-    --accent-color: #bb86fc;
-    --accent-hover-color: #a062f8;
-    --error-color: #cf6679;
+    --bg-color: #f4f4f9; /* Açık gri arkaplan */
+    --card-color: #ffffff; /* Beyaz kartlar */
+    --border-color: #e0e0e0; /* Açık gri sınırlar */
+    --primary-text-color: #212121; /* Koyu gri ana metin */
+    --secondary-text-color: #666666; /* Orta ton gri ikincil metin */
+    --accent-color: #5c6bc0; /* İndigo gibi bir vurgu rengi */
+    --accent-hover-color: #3949ab; /* Vurgu renginin koyu tonu */
+    --error-color: #d32f2f; /* Canlı kırmızı hata rengi */
 }
 
 * {
@@ -29,13 +29,13 @@ body {
     background-color: var(--card-color);
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* Gölgeyi yumuşattım */
 }
 
 h1 {
     font-family: 'Merriweather', serif;
     text-align: center;
-    color: #ffffff;
+    color: var(--primary-text-color); /* Değiştirildi */
     font-size: 2.5rem;
 }
 
@@ -57,7 +57,7 @@ h1 {
 }
 
 #language-select {
-    background-color: #2a2a2a;
+    background-color: #f0f0f0; /* Değiştirildi */
     color: var(--primary-text-color);
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -84,7 +84,7 @@ h1 {
 }
 
 .history-item {
-    background-color: #333;
+    background-color: #e9e9f0; /* Değiştirildi */
     color: var(--secondary-text-color);
     padding: 0.25rem 0.75rem;
     border-radius: 16px;
@@ -96,7 +96,7 @@ h1 {
 
 .history-item:hover {
     background-color: var(--accent-color);
-    color: #121212;
+    color: #ffffff; /* Değiştirildi */
 }
 
 /* --- Form Styles --- */
@@ -112,7 +112,7 @@ h1 {
     font-size: 1rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    background-color: #2a2a2a;
+    background-color: var(--bg-color); /* Değiştirildi */
     color: var(--primary-text-color);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
@@ -120,7 +120,7 @@ h1 {
 #search-input:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.25);
+    box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.25); /* Vurgu renginin rgba'sı */
 }
 
 #search-form button {
@@ -129,7 +129,7 @@ h1 {
     border: none;
     border-radius: 8px;
     background-color: var(--accent-color);
-    color: #121212;
+    color: #ffffff; /* Değiştirildi */
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -173,7 +173,7 @@ h1 {
 #results-container h2 {
     font-family: 'Merriweather', serif;
     font-size: 3rem;
-    color: white;
+    color: var(--primary-text-color); /* Değiştirildi */
     margin-bottom: 1rem;
     text-transform: capitalize;
 }
@@ -218,11 +218,11 @@ h1 {
     transition: background-color 0.3s, border-color 0.3s;
 }
 .action-button:hover {
-    background-color: #333;
+    background-color: #f0f0f0; /* Değiştirildi */
     border-color: var(--secondary-text-color);
 }
 .action-button:disabled {
-    opacity: 0.4;
+    opacity: 0.5; /* Opaklık ayarlandı */
     cursor: not-allowed;
 }
 
@@ -230,7 +230,7 @@ h1 {
 /* NEW: Clickable Synonym/Antonym Styles */
 #result-synonyms button, #result-antonyms button {
     background-color: transparent;
-    border: 1px solid #444;
+    border: 1px solid #cccccc; /* Değiştirildi */
     color: var(--secondary-text-color);
     padding: 0.25rem 0.75rem;
     margin: 0.25rem;
@@ -242,7 +242,7 @@ h1 {
 #result-synonyms button:hover, #result-antonyms button:hover {
     background-color: var(--accent-hover-color);
     border-color: var(--accent-hover-color);
-    color: #121212;
+    color: #ffffff; /* Değiştirildi */
 }
 
 
@@ -271,7 +271,7 @@ h1 {
 }
 
 .loader {
-    border: 4px solid #333;
+    border: 4px solid #e0e0e0; /* Değiştirildi */
     border-top: 4px solid var(--accent-color);
     border-radius: 50%;
     width: 40px;
@@ -288,7 +288,7 @@ h1 {
 .error-message {
     text-align: center;
     color: var(--error-color);
-    background-color: rgba(207, 102, 121, 0.1);
+    background-color: rgba(211, 47, 47, 0.1); /* Hata rengi rgba'sı */
     padding: 1rem;
     border-radius: 8px;
     border: 1px solid var(--error-color);
@@ -328,7 +328,7 @@ h1 {
 
 #compare-form .compare-inputs input {
     width: 100%;
-    background-color: #2a2a2a;
+    background-color: var(--bg-color); /* Değiştirildi */
     color: var(--primary-text-color);
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -342,7 +342,7 @@ h1 {
     font-size: 1rem;
     border: none;
     border-radius: 8px;
-    background-color: #333;
+    background-color: #e0e0e0; /* Değiştirildi */
     color: var(--primary-text-color);
     font-weight: bold;
     cursor: pointer;
@@ -350,7 +350,7 @@ h1 {
 }
 
 #compare-form button:hover {
-    background-color: #444;
+    background-color: #d5d5d5; /* Değiştirildi */
 }
 
 #compare-results-container {
@@ -381,7 +381,7 @@ h1 {
 
 #sentence-input {
     width: 100%;
-    background-color: #2a2a2a;
+    background-color: var(--bg-color); /* Değiştirildi */
     color: var(--primary-text-color);
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -394,7 +394,7 @@ h1 {
 #validate-sentence-button {
     align-self: flex-end;
     background-color: var(--accent-color);
-    color: #121212;
+    color: #ffffff; /* Değiştirildi */
     border: none;
     border-radius: 6px;
     padding: 0.5rem 1rem;
@@ -406,14 +406,14 @@ h1 {
     background-color: var(--accent-hover-color);
 }
 #validate-sentence-button:disabled {
-    background-color: #555;
+    background-color: #cccccc; /* Değiştirildi */
     cursor: not-allowed;
 }
 
 #validation-result {
     margin-top: 1rem;
     padding: 1rem;
-    background-color: rgba(187, 134, 252, 0.05);
+    background-color: rgba(92, 107, 192, 0.1); /* Vurgu rengi rgba'sı */
     border-left: 4px solid var(--accent-color);
     border-radius: 4px;
     font-size: 0.95rem;

@@ -10,7 +10,7 @@ if (!GEMINI_API_KEY || !UNSPLASH_ACCESS_KEY) {
 }
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 exports.handler = async function (event, context) {
   // --- YENİ: Boş parametre nesnesini kontrol et ---

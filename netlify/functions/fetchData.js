@@ -27,16 +27,18 @@ exports.handler = async function (event, context) {
       if (!word) return { statusCode: 400, body: JSON.stringify({ error: "Word parameter is required." }) };
       
       const prompt = `
-        Provide a detailed dictionary entry for the word or phrase: "${word}" in ${language || 'English'}.
-        Your response must be in ${language || 'English'}.
-        Include the following sections clearly labeled EXACTLY as shown with markdown bolding:
+        Provide a detailed dictionary entry for the word or phrase: "${word}".
+        The entire response, including all explanations and section titles, must be strictly in English.
+
+        Include the following sections, labeled EXACTLY as shown with markdown bolding:
+        
         **Pronunciation:** [Provide phonetic spelling or IPA here]
-        **Definitions:** [List all common meanings with examples for each]
-        **Synonyms:** [Provide a comma-separated list]
-        **Antonyms:** [Provide a comma-separated list]
-        **Etymology:** [Provide a brief etymology]
-        **Example Sentences:** [List at least 3 diverse example sentences]
-        **Turkish Meaning:** [Provide the meaning in Turkish. If the source language is Turkish, just write the word itself.]
+        **Definitions:** [List all common meanings with examples for each. All text must be in English.]
+        **Synonyms:** [Provide a comma-separated list of English synonyms.]
+        **Antonyms:** [Provide a comma-separated list of English antonyms.]
+        **Etymology:** [Provide a brief etymology, in English.]
+        **Example Sentences:** [List at least 3 diverse example sentences in English.]
+        **Turkish Meaning:** [Provide only the direct Turkish translation(s) for "${word}" in this section. No other Turkish text should appear anywhere else in the response.]
       `;
 
       const [geminiResult, imageResponse] = await Promise.all([

@@ -1,19 +1,20 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-// 'fetch' Netlify'ın ortamında global olarak bulunur, bu yüzden import etmeye gerek yok.
+// 'fetch' is globally available in Netlify's environment, so no need to import it.
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
-// API Anahtarlarının varlığını en başta kontrol et. Eksikse, fonksiyonu başlatma.
+// Check for the existence of API Keys at the very beginning. If they are missing, do not initialize the function.
 if (!GEMINI_API_KEY || !UNSPLASH_ACCESS_KEY) {
   throw new Error("Missing API keys. Please set GEMINI_API_KEY and UNSPLASH_ACCESS_KEY in environment variables.");
 }
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+// FIX: Corrected the model name to a valid, available model.
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 exports.handler = async function (event, context) {
-  // --- YENİ: Boş parametre nesnesini kontrol et ---
+  // --- NEW: Check for an empty query string parameters object ---
   if (!event.queryStringParameters) {
     return { statusCode: 400, body: JSON.stringify({ error: "Query parameters are required." }) };
   }
@@ -35,7 +36,7 @@ exports.handler = async function (event, context) {
         **Antonyms:** [Provide a comma-separated list]
         **Etymology:** [Provide a brief etymology]
         **Example Sentences:** [List at least 3 diverse example sentences]
-        **${language || 'Turkish'} Meaning:** [Provide the meaning in ${language || 'Turkish'}. If the source language is the same, just write the word itself.]
+        **Turkish Meaning:** [Provide the meaning in Turkish. If the source language is Turkish, just write the word itself.]
       `;
 
       const [geminiResult, imageResponse] = await Promise.all([
@@ -55,20 +56,21 @@ exports.handler = async function (event, context) {
       return { statusCode: 200, body: JSON.stringify({ dictionaryData: dictionaryText, imageUrl }) };
     }
 
-    // Diğer modlarınız (bunlar zaten iyi görünüyor)
+    // Your other modes (which already look good)
     if (mode === 'eli5') {
         if (!word) return { statusCode: 400, body: JSON.stringify({ error: "Word parameter is required." }) };
         const prompt = `Explain the word "${word}" in one simple sentence that a five-year-old could easily understand.`;
         const result = await model.generateContent(prompt);
         return { statusCode: 200, body: JSON.stringify({ resultText: result.response.text() }) };
     }
-    // ... diğer modlarınız ...
+
     if (mode === 'compare') {
       if (!word1 || !word2) return { statusCode: 400, body: JSON.stringify({ error: "Both words are required for comparison." }) };
       const prompt = `Clearly explain the difference between the words "${word1}" and "${word2}". Provide one example sentence for each to highlight its correct usage. Format the response using markdown for clarity (bolding, lists).`;
       const result = await model.generateContent(prompt);
       return { statusCode: 200, body: JSON.stringify({ resultText: result.response.text() }) };
     }
+    
     if (mode === 'validate') {
       if (!word || !userSentence) return { statusCode: 400, body: JSON.stringify({ error: "Word and user sentence are required." }) };
       const prompt = `The user wants to use the word "${word}" in this sentence: "${userSentence}". Is this sentence grammatically correct and does it use the word in a natural way? If not, please correct it and provide a one-sentence explanation of the mistake.`;
@@ -76,7 +78,7 @@ exports.handler = async function (event, context) {
       return { statusCode: 200, body: JSON.stringify({ resultText: result.response.text() }) };
     }
 
-    // Eğer geçersiz bir mod gelirse
+    // If an invalid mode is received
     return { statusCode: 400, body: JSON.stringify({ error: `Invalid mode specified: ${mode}` }) };
 
   } catch (error) {

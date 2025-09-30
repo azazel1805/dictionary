@@ -11,7 +11,7 @@ if (!GEMINI_API_KEY || !UNSPLASH_ACCESS_KEY) {
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 // FIX: Corrected the model name to a valid, available model.
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 exports.handler = async function (event, context) {
   // --- NEW: Check for an empty query string parameters object ---
